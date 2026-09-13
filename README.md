@@ -1,2 +1,2 @@
-# Quespot_BE
-Quespot Backend Repo
+# CHURAI_BE
+CHURAI Backend Repo
