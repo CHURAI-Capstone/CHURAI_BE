@@ -1,0 +1,20 @@
+# 로컬 개발용 MySQL. 운영용 mysql+nginx+app 풀스택 구성은 9주차에 확장합니다.
+services:
+  churai-mysql:
+    image: 'mysql:8.0'
+    container_name: churai-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: churai
+      MYSQL_ROOT_PASSWORD: churai1234
+      TZ: Asia/Seoul
+    command: 
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    ports:
+      - '127.0.0.1:3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
