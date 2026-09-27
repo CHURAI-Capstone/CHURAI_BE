@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,6 +52,19 @@ public class GeneralExceptionAdvice {
                 .body(ApiResponse.onFailure(
                         GeneralErrorCode.BAD_REQUEST,
                         String.format("[%s] %s", fieldName, message)
+                ));
+    }
+
+    // 요청 본문이 없거나 JSON 형식이 깨진 경우
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<@NonNull ApiResponse<String>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.warn("Unreadable request body: {}", e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.onFailure(
+                        GeneralErrorCode.BAD_REQUEST,
+                        "요청 본문의 형식이 올바르지 않습니다."
                 ));
     }
 
