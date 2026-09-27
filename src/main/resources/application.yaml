@@ -27,6 +27,12 @@ spring:
       fail-on-empty-beans: false
     time-zone: Asia/Seoul
 
+jwt:
+  # 로컬 개발용 기본값입니다. 운영 환경에서는 반드시 JWT_SECRET(32바이트 이상)을 지정하세요.
+  secret: ${JWT_SECRET:churai-local-dev-jwt-secret-key-change-me-0123456789}
+  # 액세스 토큰 만료 시간(ms), 기본 1시간
+  expiration: ${JWT_EXPIRATION:3600000}
+
 server:
   port: 8080
   shutdown: graceful
