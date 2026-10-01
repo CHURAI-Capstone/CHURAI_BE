@@ -24,6 +24,7 @@ out/
 ### Environment & Security ###
 .env
 .env.*
+!.env.example
 *.log
 bin/
 

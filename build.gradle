@@ -41,6 +41,11 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
+// bootJar만 만들어 Dockerfile이 build/libs의 jar 하나만 복사하도록 plain jar 생성 끔
+tasks.named('jar') {
+    enabled = false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
