@@ -1,0 +1,22 @@
+# EC2 배포용. app 단독 구성이고 DB는 RDS를 사용합니다.
+# EC2의 ~/churai 디렉터리에 이 파일과 .env(deploy/.env.example 참고)를 두고 실행합니다.
+#   docker compose pull && docker compose up -d
+services:
+  churai-be:
+    image: ${DOCKER_USERNAME}/churai-be:latest
+    container_name: churai-be
+    restart: always
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Seoul
+      # t3.micro(메모리 1GB) 기준 힙 크기
+      JAVA_OPTS: -Xms256m -Xmx512m
+    # 외부 요청은 nginx(80/443)를 거쳐 들어오므로 8080은 EC2 내부에만 노출
+    ports:
+      - '127.0.0.1:8080:8080'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
