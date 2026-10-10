@@ -13,6 +13,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
@@ -65,6 +66,19 @@ public class GeneralExceptionAdvice {
                 .body(ApiResponse.onFailure(
                         GeneralErrorCode.BAD_REQUEST,
                         "요청 본문의 형식이 올바르지 않습니다."
+                ));
+    }
+
+    // 경로/쿼리 파라미터 타입이 맞지 않는 경우 (예: /posts/abc, ?page=abc)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<@NonNull ApiResponse<String>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.warn("Type mismatch on parameter '{}': {}", e.getName(), e.getValue());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.onFailure(
+                        GeneralErrorCode.BAD_REQUEST,
+                        String.format("[%s] 올바른 형식이 아닙니다.", e.getName())
                 ));
     }
 
