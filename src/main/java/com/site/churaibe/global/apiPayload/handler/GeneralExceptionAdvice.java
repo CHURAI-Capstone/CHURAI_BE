@@ -13,7 +13,9 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
@@ -43,6 +45,10 @@ public class GeneralExceptionAdvice {
         FieldError fieldError = e.getBindingResult().getFieldError();
 
         String message = (fieldError != null) ? fieldError.getDefaultMessage() : "검증 오류가 발생했습니다.";
+        // 형식 변환 실패(예: 없는 category 값)는 스프링 기본 메시지 대신 안내 문구 사용
+        if (fieldError != null && fieldError.isBindingFailure()) {
+            message = "올바른 형식이 아닙니다.";
+        }
         String fieldName = (fieldError != null) ? fieldError.getField() : "알 수 없는 필드";
 
         log.warn("Validation error on field '{}': {}", fieldName, message);
@@ -80,6 +86,28 @@ public class GeneralExceptionAdvice {
                         GeneralErrorCode.BAD_REQUEST,
                         String.format("[%s] 올바른 형식이 아닙니다.", e.getName())
                 ));
+    }
+
+    // 파일 크기가 multipart 제한을 넘은 경우
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<@NonNull ApiResponse<Void>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        BaseErrorCode code = GeneralErrorCode.PAYLOAD_TOO_LARGE;
+        log.warn("Upload size exceeded: {}", e.getMessage());
+
+        return ResponseEntity
+                .status(code.getHttpStatus())
+                .body(ApiResponse.onFailure(code));
+    }
+
+    // 지원하지 않는 Content-Type 요청 (예: 게시글 작성/수정에 JSON을 보낸 경우)
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<@NonNull ApiResponse<Void>> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        BaseErrorCode code = GeneralErrorCode.UNSUPPORTED_MEDIA_TYPE;
+        log.warn("Unsupported media type: {}", e.getContentType());
+
+        return ResponseEntity
+                .status(code.getHttpStatus())
+                .body(ApiResponse.onFailure(code));
     }
 
     // 존재하지 않는 경로 요청 처리
