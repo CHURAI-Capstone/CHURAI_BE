@@ -16,7 +16,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = "writer")
     Page<Post> findAll(Pageable pageable);
 
-    @EntityGraph(attributePaths = "writer")
+    @EntityGraph(attributePaths = {"writer", "postImages"})
     Optional<Post> findWithWriterById(Long id);
 
     // 동시 조회 시 증가분이 유실되지 않도록 DB에서 바로 +1 (updated_at은 바뀌지 않음)
