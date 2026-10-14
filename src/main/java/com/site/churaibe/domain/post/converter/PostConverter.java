@@ -33,6 +33,7 @@ public class PostConverter {
                 .views(post.getViews())
                 .writerId(post.getWriter().getId())
                 .writerNickname(post.getWriter().getNickname())
+                .thumbnailUrl(post.getPostImages().stream().findFirst().map(PostImage::getImageUrl).orElse(null))
                 .createdAt(post.getCreatedAt())
                 .build();
     }

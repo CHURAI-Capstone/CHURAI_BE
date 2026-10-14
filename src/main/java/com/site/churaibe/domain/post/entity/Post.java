@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -56,7 +57,9 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "writer_id", nullable = false)
     private User writer;
 
+    // 목록에서 썸네일(첫 이미지)을 읽을 때 게시글마다 쿼리가 나가지 않도록 묶어서 조회
     @Builder.Default
+    @BatchSize(size = 50)
     @OrderBy("id ASC")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImages = new ArrayList<>();
