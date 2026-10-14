@@ -11,13 +11,14 @@ import com.site.churaibe.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,10 +32,10 @@ public class PostController implements PostControllerDocs {
     private final PostQueryService postQueryService;
 
     @Override
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PostResDTO.PostSaveResDTO> createPost(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                             @RequestBody @Valid PostReqDTO.PostSaveDTO dto) {
+                                                             @ModelAttribute @Valid PostReqDTO.PostSaveDTO dto) {
         return ApiResponse.onSuccess(PostSuccessCode.POST_CREATED,
                 postCommandService.createPost(userDetails.getUser().getId(), dto));
     }
@@ -53,10 +54,10 @@ public class PostController implements PostControllerDocs {
     }
 
     @Override
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PostResDTO.PostDetailDTO> updatePost(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @PathVariable Long postId,
-                                                            @RequestBody @Valid PostReqDTO.PostUpdateDTO dto) {
+                                                            @ModelAttribute @Valid PostReqDTO.PostUpdateDTO dto) {
         return ApiResponse.onSuccess(PostSuccessCode.POST_UPDATED,
                 postCommandService.updatePost(userDetails.getUser().getId(), postId, dto));
     }

@@ -47,7 +47,15 @@ public class PostResDTO {
             Long writerId,
             String writerNickname,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            List<PostImageDTO> images
+    ) {
+    }
+
+    @Builder
+    public record PostImageDTO(
+            Long imageId,
+            String imageUrl
     ) {
     }
 }

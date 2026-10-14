@@ -3,7 +3,9 @@ package com.site.churaibe.domain.post.converter;
 import com.site.churaibe.domain.post.dto.request.PostReqDTO;
 import com.site.churaibe.domain.post.dto.response.PostResDTO;
 import com.site.churaibe.domain.post.entity.Post;
+import com.site.churaibe.domain.post.entity.PostImage;
 import com.site.churaibe.domain.user.entity.User;
+import com.site.churaibe.global.s3.S3Service;
 import org.springframework.data.domain.Page;
 
 public class PostConverter {
@@ -57,6 +59,21 @@ public class PostConverter {
                 .writerNickname(post.getWriter().getNickname())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .images(post.getPostImages().stream().map(PostConverter::toPostImageDTO).toList())
+                .build();
+    }
+
+    public static PostResDTO.PostImageDTO toPostImageDTO(PostImage image) {
+        return PostResDTO.PostImageDTO.builder()
+                .imageId(image.getId())
+                .imageUrl(image.getImageUrl())
+                .build();
+    }
+
+    public static PostImage toPostImage(S3Service.UploadedFile file) {
+        return PostImage.builder()
+                .imageUrl(file.url())
+                .s3Key(file.key())
                 .build();
     }
 }

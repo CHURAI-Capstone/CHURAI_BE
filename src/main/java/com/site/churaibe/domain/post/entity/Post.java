@@ -3,6 +3,7 @@ package com.site.churaibe.domain.post.entity;
 import com.site.churaibe.domain.post.enums.Category;
 import com.site.churaibe.domain.user.entity.User;
 import com.site.churaibe.global.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +14,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +55,25 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "writer_id", nullable = false)
     private User writer;
+
+    @Builder.Default
+    @OrderBy("id ASC")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImage> postImages = new ArrayList<>();
+
+    public void addImage(PostImage image) {
+        image.assignPost(this);
+        postImages.add(image);
+    }
+
+    // 지정한 이미지를 게시글에서 빼고, S3에서 지울 키를 돌려줌
+    public List<String> removeImages(Collection<Long> imageIds) {
+        List<PostImage> removed = postImages.stream()
+                .filter(image -> imageIds.contains(image.getId()))
+                .toList();
+        postImages.removeAll(removed);
+        return removed.stream().map(PostImage::getS3Key).toList();
+    }
 
     public void update(String title, String contents, Category category) {
         this.title = title;
