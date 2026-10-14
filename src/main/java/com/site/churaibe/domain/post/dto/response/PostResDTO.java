@@ -21,6 +21,8 @@ public class PostResDTO {
             Long views,
             Long writerId,
             String writerNickname,
+            // 첫 번째 이미지, 이미지가 없으면 null
+            String thumbnailUrl,
             LocalDateTime createdAt
     ) {
     }
