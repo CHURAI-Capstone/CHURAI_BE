@@ -1,5 +1,6 @@
 package com.site.churaibe.domain.post.dto.response;
 
+import com.site.churaibe.domain.comment.dto.response.CommentResDTO;
 import com.site.churaibe.domain.post.enums.Category;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,7 +51,9 @@ public class PostResDTO {
             String writerNickname,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
-            List<PostImageDTO> images
+            List<PostImageDTO> images,
+            // 최상위 댓글 목록, 각 댓글의 replies에 대댓글이 담김
+            List<CommentResDTO.CommentDTO> comments
     ) {
     }
 

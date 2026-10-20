@@ -1,5 +1,7 @@
 package com.site.churaibe.domain.post.service.command;
 
+import com.site.churaibe.domain.comment.repository.CommentRepository;
+import com.site.churaibe.domain.comment.service.query.CommentQueryService;
 import com.site.churaibe.domain.post.converter.PostConverter;
 import com.site.churaibe.domain.post.dto.request.PostReqDTO;
 import com.site.churaibe.domain.post.dto.response.PostResDTO;
@@ -25,6 +27,8 @@ public class PostCommandService {
     private static final int MAX_IMAGE_COUNT = 3;
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final CommentQueryService commentQueryService;
     private final UserRepository userRepository;
     private final S3Service s3Service;
 
@@ -52,13 +56,16 @@ public class PostCommandService {
         // 응답의 updatedAt이 수정 시각으로 채워지도록 먼저 반영
         postRepository.flush();
         s3Service.deleteAfterCommit(removedKeys);
-        return PostConverter.toPostDetailDTO(post);
+        return PostConverter.toPostDetailDTO(post, commentQueryService.getCommentTree(postId));
     }
 
     public void deletePost(Long userId, Long postId) {
         Post post = getPostWrittenBy(userId, postId);
         List<String> imageKeys = post.getPostImages().stream().map(PostImage::getS3Key).toList();
 
+        // 대댓글을 먼저 지워야 부모 댓글 FK에 걸리지 않음
+        commentRepository.deleteRepliesByPostId(postId);
+        commentRepository.deleteAllByPostId(postId);
         postRepository.delete(post);
         s3Service.deleteAfterCommit(imageKeys);
     }
