@@ -1,11 +1,13 @@
 package com.site.churaibe.domain.post.converter;
 
+import com.site.churaibe.domain.comment.dto.response.CommentResDTO;
 import com.site.churaibe.domain.post.dto.request.PostReqDTO;
 import com.site.churaibe.domain.post.dto.response.PostResDTO;
 import com.site.churaibe.domain.post.entity.Post;
 import com.site.churaibe.domain.post.entity.PostImage;
 import com.site.churaibe.domain.user.entity.User;
 import com.site.churaibe.global.s3.S3Service;
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public class PostConverter {
@@ -49,7 +51,7 @@ public class PostConverter {
                 .build();
     }
 
-    public static PostResDTO.PostDetailDTO toPostDetailDTO(Post post) {
+    public static PostResDTO.PostDetailDTO toPostDetailDTO(Post post, List<CommentResDTO.CommentDTO> comments) {
         return PostResDTO.PostDetailDTO.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
@@ -61,6 +63,7 @@ public class PostConverter {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .images(post.getPostImages().stream().map(PostConverter::toPostImageDTO).toList())
+                .comments(comments)
                 .build();
     }
 

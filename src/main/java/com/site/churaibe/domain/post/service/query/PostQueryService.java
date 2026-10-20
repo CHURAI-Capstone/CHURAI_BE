@@ -1,5 +1,6 @@
 package com.site.churaibe.domain.post.service.query;
 
+import com.site.churaibe.domain.comment.service.query.CommentQueryService;
 import com.site.churaibe.domain.post.converter.PostConverter;
 import com.site.churaibe.domain.post.dto.response.PostResDTO;
 import com.site.churaibe.domain.post.entity.Post;
@@ -19,6 +20,7 @@ public class PostQueryService {
     private static final int MAX_PAGE_SIZE = 50;
 
     private final PostRepository postRepository;
+    private final CommentQueryService commentQueryService;
 
     // 최신순, page는 0부터 시작
     public PostResDTO.PostPageDTO getPosts(int page, int size) {
@@ -40,6 +42,6 @@ public class PostQueryService {
 
         Post post = postRepository.findWithWriterById(postId)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
-        return PostConverter.toPostDetailDTO(post);
+        return PostConverter.toPostDetailDTO(post, commentQueryService.getCommentTree(postId));
     }
 }
