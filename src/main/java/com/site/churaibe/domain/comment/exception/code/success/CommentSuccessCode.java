@@ -14,6 +14,9 @@ public enum CommentSuccessCode implements BaseSuccessCode {
     COMMENT_DELETED(HttpStatus.OK,
             "COMMENT200_1",
             "댓글을 삭제했습니다."),
+    COMMENT_UPDATED(HttpStatus.OK,
+            "COMMENT200_2",
+            "댓글을 수정했습니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -5,6 +5,8 @@ import com.site.churaibe.domain.post.dto.request.PostReqDTO;
 import com.site.churaibe.domain.post.dto.response.PostResDTO;
 import com.site.churaibe.domain.post.entity.Post;
 import com.site.churaibe.domain.post.entity.PostImage;
+import com.site.churaibe.domain.reaction.dto.response.ReactionResDTO;
+import com.site.churaibe.domain.scrap.dto.response.ScrapResDTO;
 import com.site.churaibe.domain.user.entity.User;
 import com.site.churaibe.global.s3.S3Service;
 import java.util.List;
@@ -85,7 +87,9 @@ public class PostConverter {
                 .build();
     }
 
-    public static PostResDTO.PostDetailDTO toPostDetailDTO(Post post, List<CommentResDTO.CommentDTO> comments) {
+    public static PostResDTO.PostDetailDTO toPostDetailDTO(Post post, List<CommentResDTO.CommentDTO> comments,
+                                                           ReactionResDTO.ReactionSummaryDTO reactions,
+                                                           ScrapResDTO.ScrapDTO scrap) {
         return PostResDTO.PostDetailDTO.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
@@ -102,6 +106,8 @@ public class PostConverter {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .images(post.getPostImages().stream().map(PostConverter::toPostImageDTO).toList())
+                .reactions(reactions)
+                .scrap(scrap)
                 .comments(comments)
                 .build();
     }

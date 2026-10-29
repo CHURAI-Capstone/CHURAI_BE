@@ -59,8 +59,10 @@ public class PostController implements PostControllerDocs {
 
     @Override
     @GetMapping("/{postId}")
-    public ApiResponse<PostResDTO.PostDetailDTO> getPost(@PathVariable Long postId) {
-        return ApiResponse.onSuccess(PostSuccessCode.POST_DETAIL_SUCCESS, postQueryService.getPost(postId));
+    public ApiResponse<PostResDTO.PostDetailDTO> getPost(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                         @PathVariable Long postId) {
+        return ApiResponse.onSuccess(PostSuccessCode.POST_DETAIL_SUCCESS,
+                postQueryService.getPost(postId, userDetails == null ? null : userDetails.getUser().getId()));
     }
 
     @Override

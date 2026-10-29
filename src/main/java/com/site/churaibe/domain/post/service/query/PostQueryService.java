@@ -11,6 +11,8 @@ import com.site.churaibe.domain.post.exception.PostException;
 import com.site.churaibe.domain.post.exception.code.error.PostErrorCode;
 import com.site.churaibe.domain.post.repository.PostRepository;
 import com.site.churaibe.domain.post.repository.PostSpecs;
+import com.site.churaibe.domain.reaction.service.ReactionService;
+import com.site.churaibe.domain.scrap.service.ScrapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class PostQueryService {
 
     private final PostRepository postRepository;
     private final CommentQueryService commentQueryService;
+    private final ReactionService reactionService;
+    private final ScrapService scrapService;
 
     // 검색/필터/정렬 조건은 모두 선택, page는 0부터 시작
     public PostResDTO.PostPageDTO getPosts(String keyword, Category category, String tag, Spectrum spectrum,
@@ -40,13 +44,15 @@ public class PostQueryService {
 
     // 상세 조회 시 조회수 +1 이 함께 일어나므로 쓰기 트랜잭션
     @Transactional
-    public PostResDTO.PostDetailDTO getPost(Long postId) {
+    // userId는 비로그인이면 null
+    public PostResDTO.PostDetailDTO getPost(Long postId, Long userId) {
         if (postRepository.increaseViews(postId) == 0) {
             throw new PostException(PostErrorCode.POST_NOT_FOUND);
         }
 
         Post post = postRepository.findWithWriterById(postId)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
-        return PostConverter.toPostDetailDTO(post, commentQueryService.getCommentTree(postId));
+        return PostConverter.toPostDetailDTO(post, commentQueryService.getCommentTree(postId),
+                reactionService.getSummary(postId, userId), scrapService.getScrap(postId, userId));
     }
 }
