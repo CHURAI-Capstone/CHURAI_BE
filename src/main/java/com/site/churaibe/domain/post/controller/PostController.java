@@ -3,6 +3,9 @@ package com.site.churaibe.domain.post.controller;
 import com.site.churaibe.domain.post.controller.docs.PostControllerDocs;
 import com.site.churaibe.domain.post.dto.request.PostReqDTO;
 import com.site.churaibe.domain.post.dto.response.PostResDTO;
+import com.site.churaibe.domain.post.enums.Category;
+import com.site.churaibe.domain.post.enums.PostSort;
+import com.site.churaibe.domain.post.enums.Spectrum;
 import com.site.churaibe.domain.post.exception.code.success.PostSuccessCode;
 import com.site.churaibe.domain.post.service.command.PostCommandService;
 import com.site.churaibe.domain.post.service.query.PostQueryService;
@@ -42,9 +45,16 @@ public class PostController implements PostControllerDocs {
 
     @Override
     @GetMapping
-    public ApiResponse<PostResDTO.PostPageDTO> getPosts(@RequestParam(defaultValue = "0") int page,
+    public ApiResponse<PostResDTO.PostPageDTO> getPosts(@RequestParam(required = false) String keyword,
+                                                        @RequestParam(required = false) Category category,
+                                                        @RequestParam(required = false) String tag,
+                                                        @RequestParam(required = false) Spectrum spectrum,
+                                                        @RequestParam(required = false) String coreIngredient,
+                                                        @RequestParam(defaultValue = "LATEST") PostSort sort,
+                                                        @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.onSuccess(PostSuccessCode.POST_LIST_SUCCESS, postQueryService.getPosts(page, size));
+        return ApiResponse.onSuccess(PostSuccessCode.POST_LIST_SUCCESS,
+                postQueryService.getPosts(keyword, category, tag, spectrum, coreIngredient, sort, page, size));
     }
 
     @Override

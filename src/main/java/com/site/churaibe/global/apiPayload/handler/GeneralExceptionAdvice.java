@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -85,6 +86,19 @@ public class GeneralExceptionAdvice {
                 .body(ApiResponse.onFailure(
                         GeneralErrorCode.BAD_REQUEST,
                         String.format("[%s] 올바른 형식이 아닙니다.", e.getName())
+                ));
+    }
+
+    // 필수 쿼리 파라미터가 빠진 경우 (예: /explore/spectrum 에 coreIngredient 없음)
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<@NonNull ApiResponse<String>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.warn("Missing request parameter: {}", e.getParameterName());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.onFailure(
+                        GeneralErrorCode.BAD_REQUEST,
+                        String.format("[%s] 필수 파라미터입니다.", e.getParameterName())
                 ));
     }
 

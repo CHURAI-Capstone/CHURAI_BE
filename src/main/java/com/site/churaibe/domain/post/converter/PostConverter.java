@@ -17,8 +17,34 @@ public class PostConverter {
                 .title(dto.title())
                 .contents(dto.contents())
                 .category(dto.category())
+                .summary(dto.summary().trim())
+                .spectrum(dto.spectrum())
+                .coreIngredient(resolveCoreIngredient(dto.coreIngredient(), normalizeIngredients(dto.ingredients())))
+                .ingredients(normalizeIngredients(dto.ingredients()))
+                .tags(normalizeTags(dto.tags()))
                 .writer(writer)
                 .build();
+    }
+
+    // 앞뒤 공백을 지우고 중복을 제거 (입력 순서 유지)
+    public static List<String> normalizeIngredients(List<String> ingredients) {
+        return ingredients.stream().map(String::trim).filter(name -> !name.isEmpty()).distinct().toList();
+    }
+
+    // '#' 접두사를 떼고 소문자로 통일, 중복 제거
+    public static List<String> normalizeTags(List<String> tags) {
+        if (tags == null) {
+            return List.of();
+        }
+        return tags.stream()
+                .map(tag -> tag.trim().replaceFirst("^#+", "").trim().toLowerCase())
+                .filter(tag -> !tag.isEmpty())
+                .distinct()
+                .toList();
+    }
+
+    public static String resolveCoreIngredient(String coreIngredient, List<String> ingredients) {
+        return coreIngredient == null || coreIngredient.isBlank() ? ingredients.get(0) : coreIngredient.trim();
     }
 
     public static PostResDTO.PostSaveResDTO toPostSaveResDTO(Post post) {
@@ -31,7 +57,11 @@ public class PostConverter {
         return PostResDTO.PostSummaryDTO.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
+                .summary(post.getSummary())
                 .category(post.getCategory())
+                .spectrum(post.getSpectrum())
+                .coreIngredient(post.getCoreIngredient())
+                .tags(List.copyOf(post.getTags()))
                 .views(post.getViews())
                 .writerId(post.getWriter().getId())
                 .writerNickname(post.getWriter().getNickname())
@@ -40,9 +70,13 @@ public class PostConverter {
                 .build();
     }
 
+    public static List<PostResDTO.PostSummaryDTO> toPostSummaryDTOs(List<Post> posts) {
+        return posts.stream().map(PostConverter::toPostSummaryDTO).toList();
+    }
+
     public static PostResDTO.PostPageDTO toPostPageDTO(Page<Post> posts) {
         return PostResDTO.PostPageDTO.builder()
-                .posts(posts.map(PostConverter::toPostSummaryDTO).getContent())
+                .posts(toPostSummaryDTOs(posts.getContent()))
                 .page(posts.getNumber())
                 .size(posts.getSize())
                 .totalElements(posts.getTotalElements())
@@ -55,8 +89,13 @@ public class PostConverter {
         return PostResDTO.PostDetailDTO.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
+                .summary(post.getSummary())
                 .contents(post.getContents())
                 .category(post.getCategory())
+                .spectrum(post.getSpectrum())
+                .coreIngredient(post.getCoreIngredient())
+                .ingredients(List.copyOf(post.getIngredients()))
+                .tags(List.copyOf(post.getTags()))
                 .views(post.getViews())
                 .writerId(post.getWriter().getId())
                 .writerNickname(post.getWriter().getNickname())

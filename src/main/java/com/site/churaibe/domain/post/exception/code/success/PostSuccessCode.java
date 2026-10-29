@@ -23,6 +23,15 @@ public enum PostSuccessCode implements BaseSuccessCode {
     POST_DELETED(HttpStatus.OK,
             "POST200_4",
             "게시글을 삭제했습니다."),
+    HOME_SUCCESS(HttpStatus.OK,
+            "POST200_5",
+            "홈 화면 조회에 성공했습니다."),
+    CORE_INGREDIENTS_SUCCESS(HttpStatus.OK,
+            "POST200_6",
+            "핵심 재료 목록 조회에 성공했습니다."),
+    SPECTRUM_EXPLORE_SUCCESS(HttpStatus.OK,
+            "POST200_7",
+            "스펙트럼 탐색에 성공했습니다."),
     ;
 
     private final HttpStatus httpStatus;

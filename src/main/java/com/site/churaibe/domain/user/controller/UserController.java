@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +37,18 @@ public class UserController implements UserControllerDocs {
     @PostMapping("/auth/login")
     public ApiResponse<UserResDTO.LoginResDTO> login(@RequestBody @Valid UserReqDTO.LoginDTO dto) {
         return ApiResponse.onSuccess(UserSuccessCode.LOGIN_SUCCESS, userCommandService.login(dto));
+    }
+
+    @Override
+    @GetMapping("/auth/check-email")
+    public ApiResponse<UserResDTO.AvailabilityResDTO> checkEmail(@RequestParam String email) {
+        return ApiResponse.onSuccess(UserSuccessCode.AVAILABILITY_CHECK_SUCCESS, userCommandService.checkEmail(email));
+    }
+
+    @Override
+    @GetMapping("/auth/check-nickname")
+    public ApiResponse<UserResDTO.AvailabilityResDTO> checkNickname(@RequestParam String nickname) {
+        return ApiResponse.onSuccess(UserSuccessCode.AVAILABILITY_CHECK_SUCCESS, userCommandService.checkNickname(nickname));
     }
 
     @Override
