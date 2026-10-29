@@ -25,11 +25,25 @@ public class UserCommandService {
         if (userRepository.existsByEmail(dto.email())) {
             throw new UserException(UserErrorCode.DUPLICATE_EMAIL);
         }
+        if (userRepository.existsByNickname(dto.nickname())) {
+            throw new UserException(UserErrorCode.DUPLICATE_NICKNAME);
+        }
 
         User user = UserConverter.toUser(dto, passwordEncoder.encode(dto.password()));
         userRepository.saveAndFlush(user);
 
         return UserConverter.toSignUpResDTO(user);
+    }
+
+    // 회원가입 폼에서 입력 중 중복 여부를 미리 안내하는 용도
+    @Transactional(readOnly = true)
+    public UserResDTO.AvailabilityResDTO checkEmail(String email) {
+        return new UserResDTO.AvailabilityResDTO(!userRepository.existsByEmail(email));
+    }
+
+    @Transactional(readOnly = true)
+    public UserResDTO.AvailabilityResDTO checkNickname(String nickname) {
+        return new UserResDTO.AvailabilityResDTO(!userRepository.existsByNickname(nickname));
     }
 
     @Transactional(readOnly = true)

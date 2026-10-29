@@ -2,6 +2,7 @@ package com.site.churaibe.domain.post.dto.response;
 
 import com.site.churaibe.domain.comment.dto.response.CommentResDTO;
 import com.site.churaibe.domain.post.enums.Category;
+import com.site.churaibe.domain.post.enums.Spectrum;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -18,7 +19,11 @@ public class PostResDTO {
     public record PostSummaryDTO(
             Long postId,
             String title,
+            String summary,
             Category category,
+            Spectrum spectrum,
+            String coreIngredient,
+            List<String> tags,
             Long views,
             Long writerId,
             String writerNickname,
@@ -44,8 +49,14 @@ public class PostResDTO {
     public record PostDetailDTO(
             Long postId,
             String title,
+            String summary,
+            // 조합 방법
             String contents,
             Category category,
+            Spectrum spectrum,
+            String coreIngredient,
+            List<String> ingredients,
+            List<String> tags,
             Long views,
             Long writerId,
             String writerNickname,
@@ -61,6 +72,47 @@ public class PostResDTO {
     public record PostImageDTO(
             Long imageId,
             String imageUrl
+    ) {
+    }
+
+    @Builder
+    public record CategoryCountDTO(
+            Category category,
+            String description,
+            long postCount
+    ) {
+    }
+
+    // 홈 화면: 인기 Top3, 최신 꿀조합, 카테고리 영역
+    @Builder
+    public record HomeDTO(
+            List<PostSummaryDTO> popularPosts,
+            List<PostSummaryDTO> latestPosts,
+            List<CategoryCountDTO> categories
+    ) {
+    }
+
+    @Builder
+    public record CoreIngredientListDTO(
+            List<String> coreIngredients
+    ) {
+    }
+
+    @Builder
+    public record SpectrumGroupDTO(
+            Spectrum spectrum,
+            String description,
+            long totalCount,
+            // 인기순 상위 일부
+            List<PostSummaryDTO> posts
+    ) {
+    }
+
+    // 익숙한 조합 → 실험적 조합 순서의 탐색 결과
+    @Builder
+    public record SpectrumExploreDTO(
+            String coreIngredient,
+            List<SpectrumGroupDTO> groups
     ) {
     }
 }

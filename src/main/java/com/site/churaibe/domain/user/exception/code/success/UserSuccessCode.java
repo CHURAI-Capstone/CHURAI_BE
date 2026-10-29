@@ -17,6 +17,9 @@ public enum UserSuccessCode implements BaseSuccessCode {
     MY_INFO_SUCCESS(HttpStatus.OK,
             "USER200_2",
             "내 정보 조회에 성공했습니다."),
+    AVAILABILITY_CHECK_SUCCESS(HttpStatus.OK,
+            "USER200_3",
+            "중복 확인에 성공했습니다."),
     ;
 
     private final HttpStatus httpStatus;

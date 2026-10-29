@@ -1,10 +1,13 @@
 package com.site.churaibe.domain.post.entity;
 
 import com.site.churaibe.domain.post.enums.Category;
+import com.site.churaibe.domain.post.enums.Spectrum;
 import com.site.churaibe.domain.user.entity.User;
 import com.site.churaibe.global.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -41,8 +44,34 @@ public class Post extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String title;
 
+    // 조합 방법
     @Column(nullable = false, columnDefinition = "TEXT")
     private String contents;
+
+    // 한 줄 소개, 기존 게시글은 null
+    @Column(length = 100)
+    private String summary;
+
+    // 핵심 재료 기반 탐색에 쓰는 대표 재료
+    @Column(length = 50)
+    private String coreIngredient;
+
+    // 익숙한 조합 ~ 실험적 조합, 기존 게시글은 null
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Spectrum spectrum;
+
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "post_ingredients", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "name", nullable = false, length = 50)
+    private List<String> ingredients = new ArrayList<>();
+
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "name", nullable = false, length = 30)
+    private List<String> tags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -78,10 +107,18 @@ public class Post extends BaseEntity {
         return removed.stream().map(PostImage::getS3Key).toList();
     }
 
-    public void update(String title, String contents, Category category) {
+    public void update(String title, String contents, Category category, String summary, String coreIngredient,
+                       Spectrum spectrum, List<String> ingredients, List<String> tags) {
         this.title = title;
         this.contents = contents;
         this.category = category;
+        this.summary = summary;
+        this.coreIngredient = coreIngredient;
+        this.spectrum = spectrum;
+        this.ingredients.clear();
+        this.ingredients.addAll(ingredients);
+        this.tags.clear();
+        this.tags.addAll(tags);
     }
 
     public boolean isWrittenBy(Long userId) {

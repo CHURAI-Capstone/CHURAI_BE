@@ -18,6 +18,11 @@ public class UserResDTO {
     ) {
     }
 
+    public record AvailabilityResDTO(
+            boolean available
+    ) {
+    }
+
     @Builder
     public record MyInfoResDTO(
             Long userId,

@@ -49,7 +49,10 @@ public class PostCommandService {
         validateDeleteImageIds(post, deleteImageIds);
         List<MultipartFile> newImages = validateNewImages(dto.images(), post.getPostImages().size() - deleteImageIds.size());
 
-        post.update(dto.title(), dto.contents(), dto.category());
+        List<String> ingredients = PostConverter.normalizeIngredients(dto.ingredients());
+        post.update(dto.title(), dto.contents(), dto.category(), dto.summary().trim(),
+                PostConverter.resolveCoreIngredient(dto.coreIngredient(), ingredients), dto.spectrum(),
+                ingredients, PostConverter.normalizeTags(dto.tags()));
         List<String> removedKeys = post.removeImages(deleteImageIds);
         addImages(post, newImages);
 

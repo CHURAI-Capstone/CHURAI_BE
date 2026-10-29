@@ -17,6 +17,9 @@ public enum UserErrorCode implements BaseErrorCode {
     DUPLICATE_EMAIL(HttpStatus.CONFLICT,
             "USER409_1",
             "이미 가입된 이메일입니다."),
+    DUPLICATE_NICKNAME(HttpStatus.CONFLICT,
+            "USER409_2",
+            "이미 사용 중인 닉네임입니다."),
     ;
 
     private final HttpStatus httpStatus;

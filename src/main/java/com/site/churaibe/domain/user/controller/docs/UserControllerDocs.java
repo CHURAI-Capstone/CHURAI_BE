@@ -11,8 +11,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "User", description = "회원가입 / 로그인 / 내 정보 API")
 public interface UserControllerDocs {
 
-    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임으로 회원가입합니다. 이미 가입된 이메일이면 409를 반환합니다.")
+    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임으로 회원가입합니다. 이미 가입된 이메일이거나 이미 사용 중인 닉네임이면 409를 반환합니다.")
     ApiResponse<UserResDTO.SignUpResDTO> signUp(UserReqDTO.SignUpDTO dto);
+
+    @Operation(summary = "이메일 중복 확인", description = "available이 false이면 이미 가입된 이메일입니다.")
+    ApiResponse<UserResDTO.AvailabilityResDTO> checkEmail(@Parameter(description = "확인할 이메일") String email);
+
+    @Operation(summary = "닉네임 중복 확인", description = "available이 false이면 이미 사용 중인 닉네임입니다.")
+    ApiResponse<UserResDTO.AvailabilityResDTO> checkNickname(@Parameter(description = "확인할 닉네임") String nickname);
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 JWT 액세스 토큰을 발급합니다.")
     ApiResponse<UserResDTO.LoginResDTO> login(UserReqDTO.LoginDTO dto);
