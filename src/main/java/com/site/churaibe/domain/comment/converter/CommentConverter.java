@@ -3,6 +3,7 @@ package com.site.churaibe.domain.comment.converter;
 import com.site.churaibe.domain.comment.dto.request.CommentReqDTO;
 import com.site.churaibe.domain.comment.dto.response.CommentResDTO;
 import com.site.churaibe.domain.comment.entity.Comment;
+import com.site.churaibe.domain.comment.enums.CommentType;
 import com.site.churaibe.domain.post.entity.Post;
 import com.site.churaibe.domain.user.entity.User;
 import java.util.List;
@@ -14,6 +15,7 @@ public class CommentConverter {
     public static Comment toComment(CommentReqDTO.CommentSaveDTO dto, Post post, Comment parent, User writer) {
         return Comment.builder()
                 .contents(dto.contents())
+                .type(parent != null || dto.type() == null ? CommentType.GENERAL : dto.type())
                 .post(post)
                 .parent(parent)
                 .writer(writer)
@@ -44,10 +46,12 @@ public class CommentConverter {
     private static CommentResDTO.CommentDTO toCommentDTO(Comment comment, List<CommentResDTO.CommentDTO> replies) {
         return CommentResDTO.CommentDTO.builder()
                 .commentId(comment.getId())
+                .type(comment.getTypeOrDefault())
                 .contents(comment.getContents())
                 .writerId(comment.getWriter().getId())
                 .writerNickname(comment.getWriter().getNickname())
                 .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
                 .replies(replies)
                 .build();
     }

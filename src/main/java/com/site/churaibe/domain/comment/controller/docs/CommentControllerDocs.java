@@ -8,13 +8,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Comment", description = "댓글 / 대댓글 작성 / 삭제 API")
+@Tag(name = "Comment", description = "댓글 / 대댓글 작성 / 수정 / 삭제, 후기 / 변형 조합 API")
 public interface CommentControllerDocs {
 
-    @Operation(summary = "댓글 / 대댓글 작성", description = "로그인이 필요합니다. parentId 없이 보내면 댓글, 같은 게시글의 최상위 댓글 id를 parentId로 보내면 대댓글입니다(대댓글에는 다시 달 수 없음). 댓글 목록은 게시글 상세 조회 응답의 comments에 트리 구조로 담깁니다.")
+    @Operation(summary = "댓글 / 대댓글 작성", description = "로그인이 필요합니다. parentId 없이 보내면 댓글, 같은 게시글의 최상위 댓글 id를 parentId로 보내면 대댓글입니다(대댓글에는 다시 달 수 없음). type으로 GENERAL(일반 댓글, 기본) / REVIEW(후기) / VARIATION(변형 조합)을 구분하며, 대댓글은 항상 GENERAL로 저장됩니다. 댓글 목록은 게시글 상세 조회 응답의 comments에 트리 구조로 담깁니다.")
     ApiResponse<CommentResDTO.CommentSaveResDTO> createComment(@Parameter(hidden = true) CustomUserDetails userDetails,
                                                                Long postId,
                                                                CommentReqDTO.CommentSaveDTO dto);
+
+    @Operation(summary = "댓글 / 대댓글 수정", description = "작성자 본인만 수정할 수 있습니다(아니면 403). 내용(contents)만 바꿀 수 있고 type과 부모 댓글은 바꿀 수 없습니다.")
+    ApiResponse<CommentResDTO.CommentSaveResDTO> updateComment(@Parameter(hidden = true) CustomUserDetails userDetails,
+                                                               Long postId,
+                                                               Long commentId,
+                                                               CommentReqDTO.CommentUpdateDTO dto);
 
     @Operation(summary = "댓글 / 대댓글 삭제", description = "작성자 본인만 삭제할 수 있습니다(아니면 403). 최상위 댓글을 삭제하면 달린 대댓글도 함께 삭제됩니다.")
     ApiResponse<Void> deleteComment(@Parameter(hidden = true) CustomUserDetails userDetails,

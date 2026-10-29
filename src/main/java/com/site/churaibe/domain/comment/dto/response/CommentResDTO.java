@@ -1,5 +1,6 @@
 package com.site.churaibe.domain.comment.dto.response;
 
+import com.site.churaibe.domain.comment.enums.CommentType;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -16,10 +17,12 @@ public class CommentResDTO {
     @Builder
     public record CommentDTO(
             Long commentId,
+            CommentType type,
             String contents,
             Long writerId,
             String writerNickname,
             LocalDateTime createdAt,
+            LocalDateTime updatedAt,
             List<CommentDTO> replies
     ) {
     }

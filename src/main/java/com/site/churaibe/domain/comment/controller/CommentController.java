@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -33,6 +34,16 @@ public class CommentController implements CommentControllerDocs {
                                                                       @RequestBody @Valid CommentReqDTO.CommentSaveDTO dto) {
         return ApiResponse.onSuccess(CommentSuccessCode.COMMENT_CREATED,
                 commentCommandService.createComment(userDetails.getUser().getId(), postId, dto));
+    }
+
+    @Override
+    @PutMapping("/{commentId}")
+    public ApiResponse<CommentResDTO.CommentSaveResDTO> updateComment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                      @PathVariable Long postId,
+                                                                      @PathVariable Long commentId,
+                                                                      @RequestBody @Valid CommentReqDTO.CommentUpdateDTO dto) {
+        return ApiResponse.onSuccess(CommentSuccessCode.COMMENT_UPDATED,
+                commentCommandService.updateComment(userDetails.getUser().getId(), postId, commentId, dto));
     }
 
     @Override

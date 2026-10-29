@@ -35,19 +35,34 @@ public class CommentCommandService {
         return CommentConverter.toCommentSaveResDTO(comment);
     }
 
+    public CommentResDTO.CommentSaveResDTO updateComment(Long userId, Long postId, Long commentId,
+                                                         CommentReqDTO.CommentUpdateDTO dto) {
+        Comment comment = getCommentWrittenBy(userId, postId, commentId);
+        comment.updateContents(dto.contents());
+        // 수정 시각이 반영되도록 먼저 쓰기
+        commentRepository.flush();
+
+        return CommentConverter.toCommentSaveResDTO(comment);
+    }
+
     // 최상위 댓글을 지우면 달린 대댓글도 함께 지움
     public void deleteComment(Long userId, Long postId, Long commentId) {
+        Comment comment = getCommentWrittenBy(userId, postId, commentId);
+
+        if (!comment.isReply()) {
+            commentRepository.deleteRepliesByParentId(commentId);
+        }
+        commentRepository.delete(comment);
+    }
+
+    private Comment getCommentWrittenBy(Long userId, Long postId, Long commentId) {
         Comment comment = commentRepository.findWithWriterByIdAndPostId(commentId, postId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
 
         if (!comment.isWrittenBy(userId)) {
             throw new CommentException(CommentErrorCode.NOT_COMMENT_WRITER);
         }
-
-        if (!comment.isReply()) {
-            commentRepository.deleteRepliesByParentId(commentId);
-        }
-        commentRepository.delete(comment);
+        return comment;
     }
 
     private Comment getParent(Long postId, Long parentId) {

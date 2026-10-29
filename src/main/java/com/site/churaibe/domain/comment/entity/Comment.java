@@ -1,10 +1,13 @@
 package com.site.churaibe.domain.comment.entity;
 
+import com.site.churaibe.domain.comment.enums.CommentType;
 import com.site.churaibe.domain.post.entity.Post;
 import com.site.churaibe.domain.user.entity.User;
 import com.site.churaibe.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +35,11 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, length = 1000)
     private String contents;
 
+    // 일반 댓글 / 후기 / 변형 조합, 이 필드가 생기기 전의 기존 댓글은 null (일반 댓글로 취급)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private CommentType type;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
@@ -44,6 +52,14 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "writer_id", nullable = false)
     private User writer;
+
+    public void updateContents(String contents) {
+        this.contents = contents;
+    }
+
+    public CommentType getTypeOrDefault() {
+        return type == null ? CommentType.GENERAL : type;
+    }
 
     public boolean isReply() {
         return parent != null;

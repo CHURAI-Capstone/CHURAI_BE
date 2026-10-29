@@ -3,6 +3,8 @@ package com.site.churaibe.domain.post.dto.response;
 import com.site.churaibe.domain.comment.dto.response.CommentResDTO;
 import com.site.churaibe.domain.post.enums.Category;
 import com.site.churaibe.domain.post.enums.Spectrum;
+import com.site.churaibe.domain.reaction.dto.response.ReactionResDTO;
+import com.site.churaibe.domain.scrap.dto.response.ScrapResDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -63,6 +65,10 @@ public class PostResDTO {
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
             List<PostImageDTO> images,
+            // 반응별 개수와 내가 선택한 반응 (비로그인이면 myReactions는 빈 목록)
+            ReactionResDTO.ReactionSummaryDTO reactions,
+            // 스크랩 수와 내 스크랩 여부 (비로그인이면 scrapped는 false)
+            ScrapResDTO.ScrapDTO scrap,
             // 최상위 댓글 목록, 각 댓글의 replies에 대댓글이 담김
             List<CommentResDTO.CommentDTO> comments
     ) {

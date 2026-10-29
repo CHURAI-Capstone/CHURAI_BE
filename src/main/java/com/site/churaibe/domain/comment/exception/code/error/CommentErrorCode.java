@@ -13,7 +13,7 @@ public enum CommentErrorCode implements BaseErrorCode {
             "같은 게시글의 최상위 댓글에만 대댓글을 달 수 있습니다."),
     NOT_COMMENT_WRITER(HttpStatus.FORBIDDEN,
             "COMMENT403_1",
-            "댓글 작성자만 삭제할 수 있습니다."),
+            "댓글 작성자만 수정하거나 삭제할 수 있습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,
             "COMMENT404_1",
             "댓글을 찾을 수 없습니다."),

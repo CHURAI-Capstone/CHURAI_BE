@@ -10,6 +10,10 @@ import com.site.churaibe.domain.post.entity.PostImage;
 import com.site.churaibe.domain.post.exception.PostException;
 import com.site.churaibe.domain.post.exception.code.error.PostErrorCode;
 import com.site.churaibe.domain.post.repository.PostRepository;
+import com.site.churaibe.domain.reaction.repository.ReactionRepository;
+import com.site.churaibe.domain.reaction.service.ReactionService;
+import com.site.churaibe.domain.scrap.repository.ScrapRepository;
+import com.site.churaibe.domain.scrap.service.ScrapService;
 import com.site.churaibe.domain.user.entity.User;
 import com.site.churaibe.domain.user.repository.UserRepository;
 import com.site.churaibe.global.s3.S3Service;
@@ -29,6 +33,10 @@ public class PostCommandService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final CommentQueryService commentQueryService;
+    private final ReactionRepository reactionRepository;
+    private final ReactionService reactionService;
+    private final ScrapRepository scrapRepository;
+    private final ScrapService scrapService;
     private final UserRepository userRepository;
     private final S3Service s3Service;
 
@@ -59,7 +67,8 @@ public class PostCommandService {
         // 응답의 updatedAt이 수정 시각으로 채워지도록 먼저 반영
         postRepository.flush();
         s3Service.deleteAfterCommit(removedKeys);
-        return PostConverter.toPostDetailDTO(post, commentQueryService.getCommentTree(postId));
+        return PostConverter.toPostDetailDTO(post, commentQueryService.getCommentTree(postId),
+                reactionService.getSummary(postId, userId), scrapService.getScrap(postId, userId));
     }
 
     public void deletePost(Long userId, Long postId) {
@@ -69,6 +78,8 @@ public class PostCommandService {
         // 대댓글을 먼저 지워야 부모 댓글 FK에 걸리지 않음
         commentRepository.deleteRepliesByPostId(postId);
         commentRepository.deleteAllByPostId(postId);
+        reactionRepository.deleteAllByPostId(postId);
+        scrapRepository.deleteAllByPostId(postId);
         postRepository.delete(post);
         s3Service.deleteAfterCommit(imageKeys);
     }

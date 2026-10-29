@@ -28,8 +28,8 @@ public interface PostControllerDocs {
                                                  @Parameter(description = "페이지 번호 (0부터)") int page,
                                                  @Parameter(description = "페이지 크기 (1~50)") int size);
 
-    @Operation(summary = "게시글 상세 조회", description = "로그인 없이 조회할 수 있고, 조회할 때마다 조회수가 1 증가합니다. images에 이미지 id와 URL이 순서대로 담깁니다.")
-    ApiResponse<PostResDTO.PostDetailDTO> getPost(Long postId);
+    @Operation(summary = "게시글 상세 조회", description = "로그인 없이 조회할 수 있고, 조회할 때마다 조회수가 1 증가합니다. images에 이미지 id와 URL이 순서대로 담기고, reactions(반응별 개수와 내가 선택한 반응)와 scrap(스크랩 수와 내 스크랩 여부)은 로그인한 경우에 내 상태까지 반영됩니다(Authorization 헤더는 선택).")
+    ApiResponse<PostResDTO.PostDetailDTO> getPost(@Parameter(hidden = true) CustomUserDetails userDetails, Long postId);
 
     @Operation(summary = "게시글 수정", description = "작성자 본인만 수정할 수 있습니다(아니면 403). multipart/form-data로 이미지를 제외한 모든 필드를 작성할 때와 같이 보내야 합니다. 지울 이미지는 deleteImageIds로, 새 이미지는 images로 보내며 남는 이미지와 합쳐 최대 3장입니다.")
     ApiResponse<PostResDTO.PostDetailDTO> updatePost(@Parameter(hidden = true) CustomUserDetails userDetails,
