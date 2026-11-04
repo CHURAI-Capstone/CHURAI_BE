@@ -9,6 +9,7 @@ import com.site.churaibe.domain.user.exception.code.error.UserErrorCode;
 import com.site.churaibe.domain.user.repository.UserRepository;
 import com.site.churaibe.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,27 @@ public class UserCommandService {
         userRepository.saveAndFlush(user);
 
         return UserConverter.toSignUpResDTO(user);
+    }
+
+    public UserResDTO.ProfileUpdateResDTO updateProfile(Long userId, UserReqDTO.ProfileUpdateDTO dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        String nickname = dto.nickname().trim();
+
+        // 현재 닉네임과 완전히 같으면 변경할 것이 없음
+        if (!nickname.equals(user.getNickname())) {
+            if (userRepository.existsByNicknameAndIdNot(nickname, userId)) {
+                throw new UserException(UserErrorCode.DUPLICATE_NICKNAME);
+            }
+            user.updateNickname(nickname);
+            try {
+                // 응답의 updatedAt이 수정 시각으로 채워지고, 동시 변경으로 인한 unique 위반을 여기서 잡기 위해 먼저 반영
+                userRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                throw new UserException(UserErrorCode.DUPLICATE_NICKNAME);
+            }
+        }
+        return UserConverter.toProfileUpdateResDTO(user);
     }
 
     // 회원가입 폼에서 입력 중 중복 여부를 미리 안내하는 용도

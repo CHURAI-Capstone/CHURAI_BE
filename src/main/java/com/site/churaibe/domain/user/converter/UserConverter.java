@@ -27,12 +27,21 @@ public class UserConverter {
                 .build();
     }
 
-    public static UserResDTO.MyInfoResDTO toMyInfoResDTO(User user) {
+    public static UserResDTO.MyInfoResDTO toMyInfoResDTO(User user, UserResDTO.ActivityCountDTO activity) {
         return UserResDTO.MyInfoResDTO.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .createdAt(user.getCreatedAt())
+                .activity(activity)
+                .build();
+    }
+
+    public static UserResDTO.ProfileUpdateResDTO toProfileUpdateResDTO(User user) {
+        return UserResDTO.ProfileUpdateResDTO.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }

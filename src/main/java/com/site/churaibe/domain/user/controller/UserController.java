@@ -1,11 +1,11 @@
 package com.site.churaibe.domain.user.controller;
 
 import com.site.churaibe.domain.user.controller.docs.UserControllerDocs;
-import com.site.churaibe.domain.user.converter.UserConverter;
 import com.site.churaibe.domain.user.dto.request.UserReqDTO;
 import com.site.churaibe.domain.user.dto.response.UserResDTO;
 import com.site.churaibe.domain.user.exception.code.success.UserSuccessCode;
 import com.site.churaibe.domain.user.service.UserCommandService;
+import com.site.churaibe.domain.user.service.UserQueryService;
 import com.site.churaibe.global.apiPayload.ApiResponse;
 import com.site.churaibe.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class UserController implements UserControllerDocs {
     private final UserCommandService userCommandService;
+    private final UserQueryService userQueryService;
 
     @Override
     @PostMapping("/auth/signup")
@@ -54,6 +56,16 @@ public class UserController implements UserControllerDocs {
     @Override
     @GetMapping("/users/me")
     public ApiResponse<UserResDTO.MyInfoResDTO> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(UserSuccessCode.MY_INFO_SUCCESS, UserConverter.toMyInfoResDTO(userDetails.getUser()));
+        return ApiResponse.onSuccess(UserSuccessCode.MY_INFO_SUCCESS,
+                userQueryService.getMyInfo(userDetails.getUser().getId()));
+    }
+
+    @Override
+    @PatchMapping("/users/me")
+    public ApiResponse<UserResDTO.ProfileUpdateResDTO> updateProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid UserReqDTO.ProfileUpdateDTO dto) {
+        return ApiResponse.onSuccess(UserSuccessCode.PROFILE_UPDATE_SUCCESS,
+                userCommandService.updateProfile(userDetails.getUser().getId(), dto));
     }
 }

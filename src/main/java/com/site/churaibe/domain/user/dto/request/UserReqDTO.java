@@ -22,6 +22,13 @@ public class UserReqDTO {
     ) {
     }
 
+    public record ProfileUpdateDTO(
+            @NotBlank(message = "닉네임은 필수입니다.")
+            @Size(max = 20, message = "닉네임은 20자 이하여야 합니다.")
+            String nickname
+    ) {
+    }
+
     public record LoginDTO(
             @NotBlank(message = "이메일은 필수입니다.")
             @Email(message = "이메일 형식이 올바르지 않습니다.")
