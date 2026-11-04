@@ -33,4 +33,8 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 20)
     private String nickname;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

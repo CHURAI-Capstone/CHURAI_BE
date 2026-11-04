@@ -10,4 +10,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByNickname(String nickname);
+
+    // 닉네임 변경 시 본인 닉네임은 중복으로 보지 않기 위해 사용 (대소문자만 바꾸는 경우 포함)
+    boolean existsByNicknameAndIdNot(String nickname, Long id);
 }

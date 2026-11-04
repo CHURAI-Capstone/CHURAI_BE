@@ -4,6 +4,9 @@ import com.site.churaibe.domain.reaction.entity.Reaction;
 import com.site.churaibe.domain.reaction.enums.ReactionType;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +14,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReactionRepository extends JpaRepository<Reaction, Long> {
     boolean existsByPostIdAndUserIdAndType(Long postId, Long userId, ReactionType type);
+
+    // 마이페이지: 먹어본 꿀조합 / 맛 평가 내역
+    @EntityGraph(attributePaths = {"post", "post.writer"})
+    Page<Reaction> findByUserIdAndTypeIn(Long userId, Collection<ReactionType> types, Pageable pageable);
+
+    long countByUserIdAndTypeIn(Long userId, Collection<ReactionType> types);
 
     @Query("select r.type, count(r) from Reaction r where r.post.id = :postId group by r.type")
     List<Object[]> countByType(@Param("postId") Long postId);

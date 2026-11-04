@@ -23,6 +23,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     @EntityGraph(attributePaths = "writer")
     Page<Post> findAll(Specification<Post> spec, Pageable pageable);
 
+    // 마이페이지: 내가 작성한 꿀조합
+    @EntityGraph(attributePaths = "writer")
+    Page<Post> findByWriterId(Long writerId, Pageable pageable);
+
+    long countByWriterId(Long writerId);
+
     @EntityGraph(attributePaths = {"writer", "postImages"})
     Optional<Post> findWithWriterById(Long id);
 
