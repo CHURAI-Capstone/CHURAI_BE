@@ -21,6 +21,10 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
 
     long countByUserIdAndTypeIn(Long userId, Collection<ReactionType> types);
 
+    // 랭킹: 여러 게시글의 반응별 개수를 한 번에 조회 → [postId, type, count]
+    @Query("select r.post.id, r.type, count(r) from Reaction r where r.post.id in :postIds group by r.post.id, r.type")
+    List<Object[]> countByPostIds(@Param("postIds") Collection<Long> postIds);
+
     @Query("select r.type, count(r) from Reaction r where r.post.id = :postId group by r.type")
     List<Object[]> countByType(@Param("postId") Long postId);
 

@@ -2,10 +2,17 @@ package com.site.churaibe.domain.post.repository;
 
 import com.site.churaibe.domain.post.entity.Post;
 import com.site.churaibe.domain.post.enums.Category;
+import com.site.churaibe.domain.post.enums.RankingCriteria;
 import com.site.churaibe.domain.post.enums.Spectrum;
+import com.site.churaibe.domain.reaction.entity.Reaction;
+import com.site.churaibe.domain.scrap.entity.Scrap;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
@@ -24,6 +31,32 @@ public class PostSpecs {
                 spectrumEq(spectrum),
                 coreIngredientEq(coreIngredient)
         );
+    }
+
+    // 랭킹 정렬: 기준 개수 내림차순 → 조회수 → 최신. 정렬이 없는 Pageable과 함께 쓸 것 (count 쿼리에는 정렬을 넣지 않음)
+    public static Specification<Post> rankedBy(RankingCriteria criteria, Category category) {
+        return categoryEq(category).and((root, query, cb) -> {
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                List<Order> orders = new ArrayList<>();
+                if (criteria == RankingCriteria.SCRAP) {
+                    Subquery<Long> scraps = query.subquery(Long.class);
+                    Root<Scrap> scrap = scraps.from(Scrap.class);
+                    scraps.select(cb.count(scrap)).where(cb.equal(scrap.get("post"), root));
+                    orders.add(cb.desc(scraps));
+                } else if (criteria.getReactionType() != null) {
+                    Subquery<Long> reactions = query.subquery(Long.class);
+                    Root<Reaction> reaction = reactions.from(Reaction.class);
+                    reactions.select(cb.count(reaction)).where(
+                            cb.equal(reaction.get("post"), root),
+                            cb.equal(reaction.get("type"), criteria.getReactionType()));
+                    orders.add(cb.desc(reactions));
+                }
+                orders.add(cb.desc(root.get("views")));
+                orders.add(cb.desc(root.get("id")));
+                query.orderBy(orders);
+            }
+            return cb.conjunction();
+        });
     }
 
     // 음식명(제목), 재료, 태그 중 하나라도 포함하면 검색됨

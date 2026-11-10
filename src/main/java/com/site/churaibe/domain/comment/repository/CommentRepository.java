@@ -2,6 +2,7 @@ package com.site.churaibe.domain.comment.repository;
 
 import com.site.churaibe.domain.comment.entity.Comment;
 import com.site.churaibe.domain.comment.enums.CommentType;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findGeneralByWriterId(@Param("writerId") Long writerId, Pageable pageable);
 
     long countByWriterId(Long writerId);
+
+    // 랭킹: 여러 게시글의 댓글 수(대댓글 포함)를 한 번에 조회 → [postId, count]
+    @Query("select c.post.id, count(c) from Comment c where c.post.id in :postIds group by c.post.id")
+    List<Object[]> countByPostIds(@Param("postIds") Collection<Long> postIds);
 
     // 자기참조 FK 때문에 대댓글을 먼저 지운 뒤 나머지를 지워야 함
     @Modifying(flushAutomatically = true)

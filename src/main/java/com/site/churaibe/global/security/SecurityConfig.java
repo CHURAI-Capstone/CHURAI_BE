@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(PERMIT_ALL_URLS).permitAll()
                         // 게시글 목록/상세 조회는 공개, 작성/수정/삭제는 인증 필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/posts", "/api/v1/posts/*",
-                                "/api/v1/home", "/api/v1/explore/**").permitAll()
+                                "/api/v1/home", "/api/v1/explore/**", "/api/v1/rankings").permitAll()
                         // 반응 집계는 공개, 선택/취소는 인증 필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/posts/*/reactions").permitAll()
                         .anyRequest().authenticated()

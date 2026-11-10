@@ -32,6 +32,9 @@ public enum PostSuccessCode implements BaseSuccessCode {
     SPECTRUM_EXPLORE_SUCCESS(HttpStatus.OK,
             "POST200_7",
             "스펙트럼 탐색에 성공했습니다."),
+    RANKING_SUCCESS(HttpStatus.OK,
+            "POST200_8",
+            "인기 랭킹 조회에 성공했습니다."),
     ;
 
     private final HttpStatus httpStatus;
