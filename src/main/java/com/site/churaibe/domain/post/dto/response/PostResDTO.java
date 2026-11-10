@@ -2,11 +2,14 @@ package com.site.churaibe.domain.post.dto.response;
 
 import com.site.churaibe.domain.comment.dto.response.CommentResDTO;
 import com.site.churaibe.domain.post.enums.Category;
+import com.site.churaibe.domain.post.enums.RankingCriteria;
 import com.site.churaibe.domain.post.enums.Spectrum;
 import com.site.churaibe.domain.reaction.dto.response.ReactionResDTO;
+import com.site.churaibe.domain.reaction.enums.ReactionType;
 import com.site.churaibe.domain.scrap.dto.response.ScrapResDTO;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 
 public class PostResDTO {
@@ -119,6 +122,31 @@ public class PostResDTO {
     public record SpectrumExploreDTO(
             String coreIngredient,
             List<SpectrumGroupDTO> groups
+    ) {
+    }
+
+    @Builder
+    public record RankedPostDTO(
+            int rank,
+            PostSummaryDTO post,
+            // 모든 반응 종류가 0건이어도 항상 담김
+            Map<ReactionType, Long> reactionCounts,
+            long scrapCount,
+            long commentCount
+    ) {
+    }
+
+    // 인기 랭킹 페이지
+    @Builder
+    public record RankingPageDTO(
+            RankingCriteria criteria,
+            Category category,
+            List<RankedPostDTO> rankings,
+            int page,
+            int size,
+            long totalElements,
+            int totalPages,
+            boolean hasNext
     ) {
     }
 }
